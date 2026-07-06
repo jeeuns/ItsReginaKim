@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "motion/react";
 
-type Page = "work" | "projects" | "about" | "contact";
+type Page = "home" | "projects" | "about" | "contact";
 
 const FF = {
   display: "var(--font-display)",
@@ -112,7 +112,7 @@ const PROJECTS = [
   },
   {
     id: 9,
-    title: "VIS145B MIDTERM",
+    title: "Dog Star Woman",
     category: "Visual Performance",
     year: "2024",
     description:
@@ -610,7 +610,7 @@ function Nav({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [projectsExpanded, setProjectsExpanded] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout>>();
-  const links: Page[] = ["work", "projects", "about", "contact"];
+  const links: Page[] = ["home", "projects", "about", "contact"];
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 24);
@@ -641,7 +641,7 @@ function Nav({
         scrolled ? "bg-[#f0f5f3]/90 backdrop-blur-sm border-b border-black/[0.07]" : ""
       }`}>
         <div className="max-w-[1320px] mx-auto px-6 py-5 flex items-center justify-between">
-          <button onClick={() => navigate("work")} style={{ fontFamily: FF.mono }}
+          <button onClick={() => navigate("home")} style={{ fontFamily: FF.mono }}
             className="text-[11px] tracking-[0.35em] text-[#4e8a7a] uppercase">
             Portfolio
           </button>
@@ -1245,16 +1245,16 @@ function ContactPage() {
           <div className="space-y-8" style={{ fontFamily: FF.body }}>
             <div>
               <p className="text-[10px] tracking-[0.35em] text-[#88aba5] uppercase mb-1.5" style={{ fontFamily: FF.mono }}>Email</p>
-              <p className="text-[#1a2421] text-lg">hello@portfolio.work</p>
+              <p className="text-[#1a2421] text-lg">reginakim99@gmail.com</p>
             </div>
             <div>
               <p className="text-[10px] tracking-[0.35em] text-[#88aba5] uppercase mb-1.5" style={{ fontFamily: FF.mono }}>Based in</p>
-              <p className="text-[#1a2421] text-lg">Rotterdam, Netherlands</p>
+              <p className="text-[#1a2421] text-lg">Walnut CA, United States of America</p>
             </div>
             <div>
-              <p className="text-[10px] tracking-[0.35em] text-[#88aba5] uppercase mb-3" style={{ fontFamily: FF.mono }}>Elsewhere</p>
+              <p className="text-[10px] tracking-[0.35em] text-[#88aba5] uppercase mb-3" style={{ fontFamily: FF.mono }}>Socials</p>
               <div className="flex gap-5 flex-wrap">
-                {["Behance", "Instagram", "LinkedIn", "Are.na"].map(s => (
+                {["Instagram", "LinkedIn"].map(s => (
                   <button key={s} className="text-[11px] tracking-[0.15em] text-[#789a94] hover:text-[#4e8a7a] transition-colors duration-200"
                     style={{ fontFamily: FF.mono }}>{s} ↗</button>
                 ))}
@@ -1288,7 +1288,7 @@ function ContactPage() {
               <div>
                 <label className="text-[10px] tracking-[0.35em] text-[#88aba5] uppercase block mb-3" style={{ fontFamily: FF.mono }}>Message</label>
                 <textarea value={form.message} onChange={e => setForm(prev => ({ ...prev, message: e.target.value }))}
-                  placeholder="Tell me about your project..." required rows={5}
+                  placeholder="Tell me about your questions and concerns..." required rows={5}
                   className="w-full bg-transparent border-b border-black/15 focus:border-[#4e8a7a] outline-none py-3 text-[#1a2421] placeholder-[#a2c0ba] transition-colors duration-200 resize-none text-base"
                   style={{ fontFamily: FF.body }} />
               </div>
@@ -1450,7 +1450,7 @@ function AnimatedBackground() {
 // ─── APP ─────────────────────────────────────────────────────────────────────
 
 export default function App() {
-  const [page, setPage] = useState<Page>("work");
+  const [page, setPage] = useState<Page>("home");
   const [detail, setDetail] = useState<DetailItem | null>(null);
   const [backTo, setBackTo] = useState<Page>("projects");
 
@@ -1482,13 +1482,13 @@ export default function App() {
             <ProjectDetailPage
               item={detail}
               onBack={closeDetail}
-              backLabel={backTo === "work" ? "Back to Work" : "Back to Projects"}
+              backLabel={backTo === "home" ? "Back to Home" : "Back to Projects"}
             />
           </motion.div>
         ) : (
           <motion.main key={page} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.28, ease: "easeInOut" }}>
-            {page === "work" && <WorkPage navigate={navigate} onOpen={item => openDetail(item, "work")} />}
+            {page === "home" && <WorkPage navigate={navigate} onOpen={item => openDetail(item, "home")} />}
             {page === "projects" && <ProjectsPage onOpen={item => openDetail(item, "projects")} />}
             {page === "about" && <AboutPage />}
             {page === "contact" && <ContactPage />}
