@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "motion/react";
+import { Canvas } from "@react-three/fiber";
+import { useGLTF, OrbitControls, Environment } from "@react-three/drei";
+
 
 type Page = "home" | "projects" | "about" | "contact";
 
@@ -15,21 +18,21 @@ const CALENDLY_URL = "https://calendly.com/your-link";
 const PROJECTS = [
   {
     id: 1,
-    title: "FLUX SYSTEM",
-    category: "Brand Identity / Motion",
-    year: "2025",
+    title: "Girl Gloop",
+    category: "Brand Identity / Product Design",
+    year: "2026",
     description:
-      "Visual identity and motion language for a creative technology studio. Built around fluid, adaptable geometric forms that respond to context.",
+      "Makeup line for Gen Z consumers",
     bg: "#e8eef6",
     accent: "#5a7fb8",
-    tags: ["Branding", "Motion", "Typography"],
+    tags: ["Branding", "3D Modeling", "Package Design", "Typography"],
     featured: true,
   },
   {
     id: 2,
     title: "SUBLIMINAL",
     category: "Audio-Visual / Film",
-    year: "2024",
+    year: "2026",
     description:
       "A 12-minute experimental short exploring synesthesia through reactive visuals synchronized with generative soundscapes.",
     bg: "#e2eff5",
@@ -39,9 +42,9 @@ const PROJECTS = [
   },
   {
     id: 3,
-    title: "GRID//BREAK",
+    title: "Farlands",
     category: "Editorial Design",
-    year: "2025",
+    year: "2026",
     description:
       "A 6-issue editorial series that systematically deconstructs the traditional magazine grid — one rule broken per issue.",
     bg: "#eeebf6",
@@ -145,7 +148,7 @@ const VIDEO_WORKS = [
     duration: "",
     client: "Self-directed",
     description:
-      "No new footage permitted — a pure test of editing instinct and storytelling built entirely from media found online.",
+      "No new footage permitted, a test of storytelling built entirely from media found online.",
     bg: "#eceaf4",
     accent: "#7a68b8",
   },
@@ -154,10 +157,10 @@ const VIDEO_WORKS = [
     title: '"THE LIVING ROOM CAFE"',
     category: "Short Film",
     year: "2024",
-    duration: "",
-    client: "Self-directed",
+    duration: "3:01",
+    client: "Co-directed and Videographed",
     description:
-      "A quietly intimate video document shot with attention to domestic space, light, and atmosphere.",
+      "A mockumentary of AI implementation in the film world. The script was written by ChatGPT, and the film was shot in a single day with a small crew.",
     bg: "#e6f0e8",
     accent: "#4e8c68",
   },
@@ -554,38 +557,26 @@ function ProjectDetailPage({
 function CalendlyEmbed() {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    // Load Calendly stylesheet once
-    if (!document.querySelector('link[href*="calendly.com"]')) {
-      const link = document.createElement("link");
-      link.rel = "stylesheet"; link.href = "https://assets.calendly.com/assets/external/widget.css";
-      document.head.appendChild(link);
-    }
+    useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://assets.calendly.com/assets/external/widget.js";
+    script.async = true;
+    document.body.appendChild(script);
 
-    const init = () => {
-      const Cal = (window as any).Calendly;
-      if (Cal && containerRef.current) {
-        Cal.initInlineWidget({
-          url: `${CALENDLY_URL}?hide_gdpr_banner=1&primary_color=b85c38&text_color=1c1814&background_color=f5f0e8`,
-          parentElement: containerRef.current,
-        });
-      }
+    return () => {
+      document.body.removeChild(script);
     };
-
-    if ((window as any).Calendly) {
-      init();
-    } else {
-      const script = document.createElement("script");
-      script.src = "https://assets.calendly.com/assets/external/widget.js";
-      script.async = true;
-      script.onload = init;
-      document.head.appendChild(script);
-    }
   }, []);
 
-  return (
-    <div ref={containerRef} className="w-full rounded-none overflow-hidden border border-black/[0.07]"
-      style={{ minWidth: 280, height: 700 }} />
+return (
+  <div
+    className="calendly-inline-widget"
+    data-url="https://calendly.com/reginakim99/30min?hide_event_type_details=1&hide_gdpr_banner=1"
+    style={{
+      minWidth: "320px",
+      height: "700px",
+    }}
+  />
   );
 }
 
@@ -1022,33 +1013,27 @@ function WorkPage({ navigate, onOpen }: { navigate: (p: Page) => void; onOpen: (
         <motion.div style={{ opacity: heroOpacity }}
           className="w-full grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-8 lg:gap-4 items-center">
           <motion.div style={{ y: textY }} className="order-2 lg:order-1 text-center lg:text-left">
-            {/* Subheading */}
-            <motion.p
-              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-              className="text-[#88aba5] mb-1"
-              style={{ fontFamily: FF.mono, fontSize: "clamp(0.65rem, 2vw, 0.85rem)", letterSpacing: "0.3em" }}>
-              Hi,
-            </motion.p>
-            {/* Title */}
-            <motion.h1
-              initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.1 }}
-              className="leading-[0.9] text-[#1a2421]"
-              style={{ fontFamily: FF.display, fontSize: "clamp(1.8rem, 10vw, 8.5rem)" }}>
-              I'm Regina,
-            </motion.h1>
             {/* Subtitle under name */}
             <motion.p
               initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, delay: 0.22 }}
               className="text-[#4e8a7a] mt-2 mb-8"
               style={{ fontFamily: FF.display, fontSize: "clamp(0.9rem, 3.5vw, 2rem)" }}>
-              your multimedia designer.
+              your multimedia designer,
             </motion.p>
+            {/* Title */}
+            <motion.h1
+              initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65, delay: 0.1 }}
+              className="leading-[1.0] text-[#1a2421]"
+              style={{ fontFamily: FF.display, fontSize: "clamp(1.8rem, 10vw, 8.5rem)" }}>
+              Regina Kim
+            </motion.h1>
+            
             {/* Body */}
             <motion.p
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.38 }}
               className="text-[#567070] text-lg leading-relaxed max-w-md mb-4 text-justify lg:text-left mx-auto lg:mx-0"
               style={{ fontFamily: FF.body }}>
-              Visual systems, motion narratives, and experiential media — crafted with intention at the edge of design and technology.
+              Branding, graphic design, 3D, editorial, video, and interactive media. Always ready to learn and build.
             </motion.p>
           </motion.div>
           <motion.div style={{ scale: sphereScale, y: sphereY }}
@@ -1087,7 +1072,7 @@ function WorkPage({ navigate, onOpen }: { navigate: (p: Page) => void; onOpen: (
               Currently available for work
             </p>
             <h2 className="text-[#1a2421]" style={{ fontFamily: FF.display, fontSize: "clamp(1rem, 5vw, 3.8rem)" }}>
-              Let's make something <span className="text-[#4e8a7a]">remarkable.</span>
+              Let's design something <span className="text-[#4e8a7a]">exceptional.</span>
             </h2>
           </motion.div>
           <motion.button initial={{ opacity: 0, x: 24 }} whileInView={{ opacity: 1, x: 0 }}
@@ -1152,17 +1137,16 @@ function ProjectsPage({ onOpen }: { onOpen: (item: DetailItem) => void }) {
 
 function AboutPage() {
   const skills = [
-    { cat: "Motion & Film", items: ["After Effects", "Premiere Pro", "DaVinci Resolve", "Cinema 4D"] },
+    { cat: "Video Editing & Film", items: ["Premiere Pro",] },
     { cat: "Design", items: ["Figma", "Illustrator", "InDesign", "Photoshop"] },
-    { cat: "Interactive", items: ["p5.js", "Three.js", "TouchDesigner", "Processing"] },
-    { cat: "Development", items: ["React", "GSAP", "WebGL", "HTML/CSS"] },
+    { cat: "Interactive", items: ["p5.js", "Three.js", "TouchDesigner", "Max", "Arduino/Microcontrollers"] },
+    { cat: "Development", items: ["HTML/CSS"] },
   ];
   const timeline = [
-    { year: "2025", event: "Senior Motion Designer, Studio FORM, Rotterdam" },
-    { year: "2024", event: "Rotterdam Media Art Biennale — PHANTOM TYPE installation" },
-    { year: "2023", event: "MA Multimedia Design, Royal Academy of Art (KABK)" },
-    { year: "2022", event: "Design Residency, Fabrica Research Centre, Treviso" },
-    { year: "2020", event: "BA Fine Arts + Computer Science, Utrecht University" },
+    { year: "2026", event: "BA Interdisciplinary Computational Arts and Media + Design, University of California San Diego" },
+    { year: "2025", event: "Envision Makerspace Volunteer" },
+    { year: "2025", event: "Design Illustrator for Other People Magazine" },
+    { year: "2021", event: "Freelance Graphic Designer" },
   ];
 
   return (
@@ -1170,14 +1154,14 @@ function AboutPage() {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-16 mb-24">
         <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
           <p className="text-[11px] tracking-[0.45em] text-[#4e8a7a] uppercase mb-4" style={{ fontFamily: FF.mono }}>About</p>
-          <h1 className="leading-[0.9] mb-10 text-[#1a2421]"
+          <h1 className="leading-[1.0] mb-10 text-[#1a2421]"
             style={{ fontFamily: FF.display, fontSize: "clamp(1.4rem, 7vw, 6rem)" }}>
             Multimedia<br />Designer.
           </h1>
           <div className="space-y-5 text-[#567070] text-[1.05rem] leading-[1.75] max-w-[54ch]" style={{ fontFamily: FF.body }}>
-            <p>I'm a multimedia designer and creative director working at the intersection of motion, identity, and emerging technology. My practice spans brand systems, audio-visual work, editorial design, and interactive experiences.</p>
-            <p>With a background in both fine arts and computer science, I bring technical rigor to creative problems — building systems that are as logical as they are visually expressive.</p>
-            <p>Currently based in Rotterdam, working with studios and brands globally. Open to full-time roles and project-based collaborations.</p>
+            <p>Hello, I'm Regina Kim, a multimedia designer and interdisciplinary artist. My practice spans brand systems, live audio-visual work, editorial design, and interactive experiences.</p>
+            <p>With a background in computational media, I bring creative solutions to technical problems.</p>
+            <p>Currently based in Walnut, CA. Open to full-time roles and project-based collaborations.</p>
           </div>
         </motion.div>
         <motion.div initial={{ opacity: 0, x: 28 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
@@ -1193,7 +1177,7 @@ function AboutPage() {
           </div>
           <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-black/[0.07]">
             <p className="text-[10px] tracking-[0.35em] text-[#4e8a7a] uppercase" style={{ fontFamily: FF.mono }}>Available for work</p>
-            <p className="text-[11px] text-[#88aba5] mt-1" style={{ fontFamily: FF.mono }}>Rotterdam, NL · Global Remote</p>
+            <p className="text-[11px] text-[#88aba5] mt-1" style={{ fontFamily: FF.mono }}>Walnut, CA · Global Remote</p>
           </div>
         </motion.div>
       </div>
@@ -1323,7 +1307,7 @@ function ContactPage() {
             Schedule a meeting
           </h2>
           <p className="text-[#688882] text-sm leading-relaxed max-w-md" style={{ fontFamily: FF.body }}>
-            Book a free 30-minute intro call. Pick a time that works for you — powered by Calendly.
+            Book a 30-minute zoom meeting for more in-depth calls.
           </p>
         </div>
         <CalendlyEmbed />
